@@ -1,0 +1,2049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zeno AI Algorithm — Quantum-Accelerated Search</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════════
+   ZENO AI — Deep Space Sci-Fi Aesthetic
+   Dark navy, quantum purple, electric cyan
+═══════════════════════════════════════════════════ */
+:root {
+  --bg:    #030712;
+  --s1:    #060e1e;
+  --s2:    #0a1628;
+  --s3:    #0f1f38;
+  --br:    #162040;
+  --br2:   #1e2e50;
+  --q:     #8b5cf6;
+  --q2:    #6d28d9;
+  --q3:    #a78bfa;
+  --c:     #06b6d4;
+  --c2:    #0891b2;
+  --c3:    #67e8f9;
+  --g:     #10b981;
+  --g2:    #34d399;
+  --r:     #f43f5e;
+  --y:     #fbbf24;
+  --wh:    #e2eeff;
+  --tx:    #94b4d8;
+  --tx2:   #4a6080;
+  --tx3:   #1e3050;
+  --FD:    'Orbitron', monospace;
+  --FB:    'Rajdhani', sans-serif;
+  --FM:    'JetBrains Mono', monospace;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;overflow:hidden;}
+
+body {
+  background: var(--bg);
+  font-family: var(--FB);
+  color: var(--tx);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── SLIDE CONTAINER ─────────────────────── */
+.slides-wrap {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .6s ease, transform .6s cubic-bezier(.4,0,.2,1);
+  transform: translateX(60px);
+  padding: 0;
+  overflow: hidden;
+}
+
+.slide.active {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateX(0);
+}
+
+.slide.exit-left {
+  opacity: 0;
+  transform: translateX(-60px);
+}
+
+/* Shared bg canvas */
+#bgCanvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.slide-content {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── NAVIGATION BAR ──────────────────────── */
+.nav-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 100;
+  height: 52px;
+  background: rgba(3,7,18,.95);
+  border-top: 1px solid var(--br2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  backdrop-filter: blur(20px);
+}
+
+.nav-slides {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.nav-pip {
+  width: 28px; height: 4px;
+  border-radius: 2px;
+  background: var(--br2);
+  cursor: pointer;
+  transition: all .3s;
+}
+.nav-pip.active { background: var(--q); box-shadow: 0 0 8px var(--q); width: 40px; }
+.nav-pip:hover { background: var(--tx2); }
+
+.nav-title {
+  font-family: var(--FD);
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--tx2);
+  text-transform: uppercase;
+}
+
+.nav-btns { display: flex; gap: 8px; }
+
+.nav-btn {
+  font-family: var(--FM);
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 7px 18px;
+  border-radius: 5px;
+  border: 1px solid var(--br2);
+  background: transparent;
+  color: var(--tx2);
+  cursor: pointer;
+  transition: all .2s;
+}
+.nav-btn:hover { color: var(--wh); border-color: var(--br); }
+.nav-btn.primary {
+  background: var(--q);
+  border-color: var(--q);
+  color: white;
+}
+.nav-btn.primary:hover { background: var(--q2); }
+
+.slide-counter {
+  font-family: var(--FM);
+  font-size: 10px;
+  color: var(--tx3);
+  letter-spacing: 1px;
+}
+
+/* ═══════════════════════════════════════════
+   SLIDE 1 — INTRO
+═══════════════════════════════════════════ */
+#s1 {
+  background: radial-gradient(ellipse 80% 60% at 50% 40%, #0f1a3a 0%, var(--bg) 70%);
+}
+
+.s1-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 60px 80px;
+  gap: 0;
+}
+
+.s1-pre {
+  font-family: var(--FM);
+  font-size: 10px;
+  letter-spacing: 5px;
+  color: var(--q3);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  animation: fadeUp .8s .2s both;
+}
+
+.s1-logo {
+  font-family: var(--FD);
+  font-size: clamp(48px, 8vw, 96px);
+  font-weight: 900;
+  letter-spacing: 6px;
+  line-height: 1;
+  margin-bottom: 10px;
+  animation: fadeUp .8s .4s both;
+  background: linear-gradient(135deg, var(--q3) 0%, #c4b5fd 30%, var(--c3) 60%, var(--q) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 40px #8b5cf650);
+}
+
+.s1-sub {
+  font-family: var(--FD);
+  font-size: clamp(16px,2vw,22px);
+  letter-spacing: 8px;
+  color: var(--c);
+  text-transform: uppercase;
+  margin-bottom: 32px;
+  animation: fadeUp .8s .55s both;
+}
+
+.s1-quote {
+  font-family: var(--FB);
+  font-size: clamp(14px,1.6vw,17px);
+  font-style: italic;
+  color: var(--tx);
+  max-width: 680px;
+  line-height: 1.8;
+  margin-bottom: 48px;
+  padding: 20px 28px;
+  border-left: 2px solid var(--q);
+  background: rgba(139,92,246,.06);
+  border-radius: 0 10px 10px 0;
+  text-align: left;
+  animation: fadeUp .8s .7s both;
+}
+
+.s1-quote::before { content: '"'; color: var(--q); font-size: 28px; line-height: .5; vertical-align: -8px; margin-right: 4px; }
+
+.s1-team {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  animation: fadeUp .8s .85s both;
+}
+
+.team-card {
+  background: var(--s2);
+  border: 1px solid var(--br2);
+  border-radius: 12px;
+  padding: 16px 22px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  min-width: 130px;
+  transition: transform .25s, box-shadow .25s;
+}
+.team-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px #8b5cf620; }
+.team-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--q), var(--c));
+}
+.team-num {
+  font-family: var(--FD);
+  font-size: 10px; letter-spacing: 2px; color: var(--q); margin-bottom: 6px;
+}
+.team-name {
+  font-family: var(--FB);
+  font-size: 15px; font-weight: 700; color: var(--wh); margin-bottom: 3px;
+}
+.team-dept {
+  font-family: var(--FM);
+  font-size: 8px; letter-spacing: 1px; color: var(--tx2); text-transform: uppercase;
+}
+
+.s1-particles { position: absolute; inset: 0; pointer-events: none; }
+
+/* ═══════════════════════════════════════════
+   SLIDE 2 — QUANTUM COMPUTER
+═══════════════════════════════════════════ */
+#s2 { background: var(--s1); }
+
+.s2-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  overflow: hidden;
+  padding-bottom: 52px;
+}
+
+.s2-left {
+  padding: 40px 32px;
+  border-right: 1px solid var(--br);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.s2-right {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Mac-style code window */
+.mac-window {
+  background: #0d1117;
+  border: 1px solid var(--br);
+  border-radius: 12px;
+  overflow: hidden;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin: 20px;
+}
+.mac-header {
+  background: #161b22;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 1px solid #30363d;
+  flex-shrink: 0;
+}
+.mac-dot { width: 12px; height: 12px; border-radius: 50%; }
+.mac-close { background: #ff5f57; }
+.mac-min { background: #febc2e; }
+.mac-max { background: #28c840; }
+.mac-title { font-family: var(--FM); font-size: 11px; color: #8b949e; margin-left: 8px; }
+.mac-body {
+  flex: 1;
+  padding: 16px 20px;
+  overflow-y: auto;
+  font-family: var(--FM);
+  font-size: 12px;
+  line-height: 1.9;
+}
+.mac-body::-webkit-scrollbar { width: 4px; }
+.mac-body::-webkit-scrollbar-thumb { background: #30363d; }
+
+/* Syntax */
+.cm  { color: #6e7681; font-style: italic; }
+.ck  { color: #ff7b72; }
+.cf  { color: #79c0ff; }
+.cs  { color: #a5d6ff; }
+.cn  { color: #ffa657; }
+.cq  { color: var(--q3); }
+.cc  { color: var(--c3); }
+.co  { color: var(--g2); }
+
+.mac-output {
+  background: #010409;
+  border-top: 1px solid #30363d;
+  padding: 12px 20px;
+  flex-shrink: 0;
+}
+.mo-label { font-family: var(--FM); font-size: 9px; letter-spacing: 2px; color: #8b949e; margin-bottom: 8px; text-transform: uppercase; }
+.mo-line { font-family: var(--FM); font-size: 11px; color: var(--g2); line-height: 1.6; }
+.mo-line.hi { color: var(--q3); }
+
+/* Bloch sphere mini visual */
+.bloch-sphere {
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  border: 2px solid var(--q);
+  position: relative;
+  margin: 16px auto 8px;
+  animation: blochSpin 6s linear infinite;
+  box-shadow: 0 0 30px #8b5cf630, inset 0 0 30px #8b5cf615;
+}
+.bloch-sphere::before {
+  content: '';
+  position: absolute;
+  inset: 20px;
+  border-radius: 50%;
+  border: 1px dashed var(--q2);
+}
+.bloch-sphere::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: -2px; right: -2px;
+  height: 1px;
+  background: var(--q2);
+}
+.bloch-arrow {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 2px; height: 50px;
+  background: linear-gradient(to top, transparent, var(--c));
+  transform-origin: bottom center;
+  transform: translate(-50%, -100%) rotate(30deg);
+  border-radius: 1px;
+}
+@keyframes blochSpin {
+  from { transform: perspective(200px) rotateY(0deg); }
+  to   { transform: perspective(200px) rotateY(360deg); }
+}
+
+/* ═══════════════════════════════════════════
+   SLIDE 3 — ZENO EFFECT
+═══════════════════════════════════════════ */
+#s3 { background: linear-gradient(160deg, #0a0f22 0%, #04060f 100%); }
+
+.s3-layout {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 0 52px;
+  overflow: hidden;
+}
+
+.s3-header {
+  padding: 28px 48px 20px;
+  border-bottom: 1px solid var(--br);
+}
+
+.slide-tag {
+  font-family: var(--FM);
+  font-size: 9px;
+  letter-spacing: 4px;
+  color: var(--q3);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.slide-tag::before { content: ''; width: 20px; height: 1px; background: var(--q); }
+
+.slide-h1 {
+  font-family: var(--FD);
+  font-size: clamp(22px,3vw,36px);
+  font-weight: 700;
+  color: var(--wh);
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+.slide-p {
+  font-size: 14px;
+  color: var(--tx);
+  line-height: 1.7;
+  max-width: 600px;
+}
+
+.s3-arena {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  overflow: hidden;
+}
+
+.zeno-lane {
+  display: flex;
+  flex-direction: column;
+  padding: 20px 28px;
+  position: relative;
+  overflow: hidden;
+}
+
+.zeno-lane + .zeno-lane {
+  border-left: 1px solid var(--br);
+}
+
+.zl-label {
+  font-family: var(--FM);
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.zl-label.free { color: var(--c); }
+.zl-label.observed { color: var(--q); }
+.zl-label .dot { width: 6px; height: 6px; border-radius: 50%; }
+
+.zeno-track {
+  flex: 1;
+  position: relative;
+  background: var(--s2);
+  border: 1px solid var(--br);
+  border-radius: 10px;
+  overflow: hidden;
+  min-height: 140px;
+}
+
+.track-line {
+  position: absolute;
+  top: 50%;
+  left: 20px; right: 20px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--br2), transparent);
+  transform: translateY(-50%);
+}
+
+.arrow-projectile {
+  position: absolute;
+  top: 50%;
+  width: 40px; height: 8px;
+  transform: translateY(-50%);
+  display: flex; align-items: center;
+}
+
+.arrow-body {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+}
+.arrow-head {
+  width: 0; height: 0;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+}
+
+.free-arrow .arrow-body { background: linear-gradient(90deg, transparent, var(--c)); }
+.free-arrow .arrow-head { border-left: 10px solid var(--c); }
+.obs-arrow .arrow-body { background: linear-gradient(90deg, transparent, var(--q)); }
+.obs-arrow .arrow-head { border-left: 10px solid var(--q); }
+
+.obs-dot {
+  position: absolute;
+  top: 50%;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--r);
+  transform: translateY(-50%);
+  box-shadow: 0 0 12px var(--r);
+  animation: obsPulse 1s ease-in-out infinite;
+}
+@keyframes obsPulse { 0%,100%{opacity:1;transform:translateY(-50%) scale(1)} 50%{opacity:.5;transform:translateY(-50%) scale(1.3)} }
+
+.obs-marker {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 1px;
+  background: rgba(244,63,94,.3);
+}
+.obs-marker::after {
+  content: attr(data-n);
+  position: absolute;
+  top: 4px;
+  left: 3px;
+  font-family: var(--FM);
+  font-size: 7px;
+  color: rgba(244,63,94,.5);
+}
+
+.zl-info {
+  margin-top: 12px;
+  font-family: var(--FM);
+  font-size: 11px;
+  line-height: 1.8;
+  color: var(--tx2);
+}
+.zl-info strong { color: var(--wh); }
+.zl-info .highlight { color: var(--q3); }
+
+.zeno-ctrl {
+  padding: 16px 28px;
+  border-top: 1px solid var(--br);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* ═══════════════════════════════════════════
+   SLIDE 4 — CLASSICAL SEARCH
+═══════════════════════════════════════════ */
+#s4 { background: var(--s1); }
+
+.s4-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 0;
+  overflow-y: auto;
+  padding-bottom: 52px;
+}
+
+.num-grid {
+    grid-template-columns: repeat(10, 1fr);
+    gap: 5px;
+    margin-bottom: 20px;
+}
+
+.s4-main {
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.s4-right {
+  border-left: 1px solid var(--br);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Number grid */
+.num-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.num-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--s2);
+  border: 1px solid var(--br);
+  border-radius: 6px;
+  font-family: var(--FM);
+  font-size: 11px;
+  color: var(--tx2);
+  transition: all .15s;
+  cursor: default;
+}
+.num-cell.scanning { background: var(--c2); border-color: var(--c); color: var(--wh); box-shadow: 0 0 10px #06b6d440; }
+.num-cell.checked  { background: var(--s3); border-color: var(--br2); color: var(--tx3); }
+.num-cell.found    { background: var(--g); border-color: var(--g2); color: #fff; box-shadow: 0 0 16px #10b98160; transform: scale(1.15); font-weight: 700; }
+.num-cell.target   { border-color: var(--y); box-shadow: 0 0 8px #fbbf2440; }
+
+/* Classical metrics */
+.class-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+.cm-box {
+  background: var(--s2);
+  border: 1px solid var(--br2);
+  border-radius: 10px;
+  padding: 14px;
+  text-align: center;
+}
+.cm-val {
+  font-family: var(--FD);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.cm-lbl { font-family: var(--FM); font-size: 8px; letter-spacing: 2px; color: var(--tx2); text-transform: uppercase; }
+
+/* Target input */
+.target-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--s2);
+  border: 1px solid var(--br2);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+.ti-label { font-family: var(--FM); font-size: 10px; letter-spacing: 2px; color: var(--tx2); text-transform: uppercase; flex-shrink: 0; }
+.ti-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--FD);
+  font-size: 16px;
+  color: var(--c);
+  width: 60px;
+  text-align: center;
+}
+/* Remove spinner */
+.ti-input::-webkit-outer-spin-button,
+.ti-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* ═══════════════════════════════════════════
+   SLIDE 5 — QUANTUM SEARCH
+═══════════════════════════════════════════ */
+#s5 { background: linear-gradient(150deg, #08061a 0%, var(--bg) 100%); }
+
+.s5-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 0;
+  overflow-y:auto;
+  padding-bottom: 52px;
+}
+
+.num-grid {
+    grid-template-columns: repeat(10, 1fr);
+    gap: 5px;
+    margin-bottom: 20px;
+}
+.s5-main {
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.s5-right {
+  border-left: 1px solid var(--br);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Quantum amplitude bars */
+.amp-grid {
+  display: flex;
+  gap: 3px;
+  align-items: flex-end;
+  height: 160px;
+  padding: 0 4px 4px;
+  background: var(--s2);
+  border: 1px solid var(--br);
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+.amp-bar {
+  flex: 1;
+  background: var(--q);
+  border-radius: 2px 2px 0 0;
+  transition: height .5s cubic-bezier(.34,1.56,.64,1);
+  position: relative;
+  opacity: .5;
+}
+.amp-bar.target-bar { background: var(--r); opacity: 1; box-shadow: 0 0 10px var(--r); }
+.amp-bar.high { opacity: 1; }
+
+/* Quantum state info */
+.qstate-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.qsi {
+  background: var(--s2);
+  border: 1px solid var(--br2);
+  border-left: 2px solid var(--q);
+  border-radius: 0 8px 8px 0;
+  padding: 12px 14px;
+}
+.qsi.c { border-left-color: var(--c); }
+.qsi.g { border-left-color: var(--g); }
+.qsi.y { border-left-color: var(--y); }
+.qsi-val { font-family: var(--FD); font-size: 20px; font-weight: 700; color: var(--wh); line-height: 1; margin-bottom: 3px; }
+.qsi-lbl { font-family: var(--FM); font-size: 8px; letter-spacing: 2px; color: var(--tx2); text-transform: uppercase; }
+
+/* ═══════════════════════════════════════════
+   SLIDE 6 — AI APPLICATIONS
+═══════════════════════════════════════════ */
+#s6 { background: var(--s1); }
+
+.s6-layout {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 0 52px;
+  overflow: hidden;
+}
+
+.app-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  overflow: hidden;
+}
+
+.app-col {
+  padding: 20px 24px;
+  border-right: 1px solid var(--br);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+}
+.app-col:last-child { border-right: none; }
+
+.app-card {
+  background: var(--s2);
+  border: 1px solid var(--br);
+  border-radius: 10px;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+  transition: transform .2s;
+}
+.app-card:hover { transform: translateY(-2px); }
+.app-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+.app-card.q-card::before { background: var(--q); }
+.app-card.c-card::before { background: var(--c); }
+.app-card.g-card::before { background: var(--g); }
+
+.ac-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 10px;
+}
+.q-card .ac-icon { background: #8b5cf615; border: 1px solid #8b5cf625; }
+.c-card .ac-icon { background: #06b6d415; border: 1px solid #06b6d425; }
+.g-card .ac-icon { background: #10b98115; border: 1px solid #10b98125; }
+
+.ac-title { font-family: var(--FD); font-size: 12px; letter-spacing: 1px; color: var(--wh); margin-bottom: 6px; }
+.ac-desc { font-size: 12px; color: var(--tx); line-height: 1.7; margin-bottom: 10px; }
+.ac-speedup {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--s3); border-radius: 6px; padding: 8px 10px;
+  font-family: var(--FM); font-size: 10px;
+}
+.ac-speedup .label { color: var(--tx2); }
+.ac-speedup .val { color: var(--g2); font-weight: 600; }
+.ac-limit {
+  font-family: var(--FM); font-size: 10px; color: var(--r);
+  background: rgba(244,63,94,.08); border: 1px solid rgba(244,63,94,.2);
+  border-radius: 6px; padding: 6px 10px; margin-top: 6px;
+}
+
+/* ═══════════════════════════════════════════
+   SLIDE 7 — REALISTIC APPROACH
+═══════════════════════════════════════════ */
+#s7 { background: var(--bg); }
+
+.s7-layout {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0 0 52px;
+  overflow-y: auto;
+}
+
+.s7-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  padding: 20px 40px;
+  flex: 1;
+}
+
+.reality-card {
+  background: var(--s2);
+  border: 1px solid var(--br);
+  border-radius: 14px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.rc-head {
+  display: flex; align-items: center; gap: 12px;
+}
+.rc-icon {
+  width: 40px; height: 40px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.rc-title { font-family: var(--FD); font-size: 14px; letter-spacing: 1px; color: var(--wh); }
+.rc-sub { font-family: var(--FM); font-size: 9px; letter-spacing: 2px; color: var(--tx2); text-transform: uppercase; margin-top: 2px; }
+.rc-body { font-size: 13px; color: var(--tx); line-height: 1.8; }
+.rc-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+.rc-list li {
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 13px; color: var(--tx); line-height: 1.6;
+}
+.rc-list li::before {
+  content: '▸';
+  color: var(--q3);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.roadmap {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  grid-column: 1 / -1;
+}
+.rm-item {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--br);
+}
+.rm-item:last-child { border-bottom: none; }
+.rm-num {
+  font-family: var(--FD);
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--br2);
+  flex-shrink: 0;
+  width: 40px;
+  line-height: 1;
+}
+.rm-content { flex: 1; }
+.rm-title { font-family: var(--FD); font-size: 13px; letter-spacing: 1px; color: var(--wh); margin-bottom: 4px; }
+.rm-desc { font-size: 13px; color: var(--tx); line-height: 1.7; }
+.rm-status {
+  font-family: var(--FM); font-size: 8px; letter-spacing: 2px; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 10px; flex-shrink: 0; align-self: center;
+}
+.rm-status.now { background: #10b98115; border: 1px solid #10b98125; color: var(--g2); }
+.rm-status.near { background: #fbbf2415; border: 1px solid #fbbf2425; color: var(--y); }
+.rm-status.future { background: #8b5cf615; border: 1px solid #8b5cf625; color: var(--q3); }
+
+/* ═══════════════════════════════════════════
+   SLIDE 8 — THANK YOU
+═══════════════════════════════════════════ */
+#s8 {
+  background: radial-gradient(ellipse 80% 70% at 50% 50%, #130e2a 0%, var(--bg) 70%);
+}
+
+.s8-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 60px 80px;
+  gap: 28px;
+}
+
+.s8-big {
+  font-family: var(--FD);
+  font-size: clamp(48px,8vw,88px);
+  font-weight: 900;
+  letter-spacing: 4px;
+  background: linear-gradient(135deg, var(--q3), var(--c3));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  animation: fadeUp .8s .2s both;
+  filter: drop-shadow(0 0 40px #8b5cf640);
+}
+
+.s8-sub {
+  font-family: var(--FM);
+  font-size: 14px;
+  letter-spacing: 3px;
+  color: var(--tx2);
+  text-transform: uppercase;
+  animation: fadeUp .8s .4s both;
+}
+
+.s8-questions {
+  font-family: var(--FD);
+  font-size: clamp(16px,2.5vw,24px);
+  color: var(--wh);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  animation: fadeUp .8s .55s both;
+  padding: 18px 36px;
+  border: 1px solid var(--br2);
+  border-radius: 12px;
+  background: rgba(139,92,246,.08);
+}
+
+.s8-team-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  animation: fadeUp .8s .7s both;
+}
+
+.s8-member {
+  font-family: var(--FM);
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--q3);
+  background: #8b5cf610;
+  border: 1px solid #8b5cf625;
+  padding: 6px 16px;
+  border-radius: 20px;
+}
+
+.s8-inst {
+  font-family: var(--FM);
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--tx3);
+  text-transform: uppercase;
+  animation: fadeUp .8s .85s both;
+}
+
+/* ═══════════════════════════════════════════
+   SHARED COMPONENTS
+═══════════════════════════════════════════ */
+.slide-header {
+  padding: 28px 48px 20px;
+  border-bottom: 1px solid var(--br);
+  flex-shrink: 0;
+}
+
+.info-box {
+  background: var(--s2);
+  border: 1px solid var(--br2);
+  border-radius: 10px;
+  padding: 14px 18px;
+  font-family: var(--FM);
+  font-size: 11px;
+  line-height: 1.9;
+  color: var(--tx);
+}
+.info-box.q { border-left: 3px solid var(--q); border-radius: 0 10px 10px 0; }
+.info-box.c { border-left: 3px solid var(--c); border-radius: 0 10px 10px 0; }
+.info-box.g { border-left: 3px solid var(--g); border-radius: 0 10px 10px 0; }
+
+.run-btn {
+  font-family: var(--FM);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 10px 22px;
+  border-radius: 7px;
+  border: 1px solid;
+  cursor: pointer;
+  transition: all .2s;
+}
+.run-btn.q { background: var(--q); border-color: var(--q); color: white; }
+.run-btn.q:hover { background: var(--q2); }
+.run-btn.c { background: var(--c); border-color: var(--c); color: var(--bg); }
+.run-btn.c:hover { background: var(--c2); }
+.run-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+.tag-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--FM);
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid;
+}
+.tag-pill.q { color: var(--q3); border-color: #8b5cf625; background: #8b5cf610; }
+.tag-pill.c { color: var(--c3); border-color: #06b6d425; background: #06b6d410; }
+.tag-pill.g { color: var(--g2); border-color: #10b98125; background: #10b98110; }
+
+/* Log panel */
+.log-panel {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: #010409;
+}
+.log-panel::-webkit-scrollbar { width: 3px; }
+.log-panel::-webkit-scrollbar-thumb { background: var(--br2); }
+
+.log-line {
+  font-family: var(--FM);
+  font-size: 10px;
+  line-height: 1.5;
+  padding: 5px 10px;
+  border-radius: 5px;
+  animation: logIn .2s ease both;
+}
+@keyframes logIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+.log-line.info { color: #8b949e; }
+.log-line.classical { color: var(--c); background: #06b6d408; border-left: 2px solid var(--c2); }
+.log-line.quantum { color: var(--q3); background: #8b5cf408; border-left: 2px solid var(--q2); }
+.log-line.success { color: var(--g2); background: #10b98108; border-left: 2px solid var(--g); font-weight: 600; }
+.log-line.error { color: var(--r); }
+
+/* Comparison bar */
+.comparison-row {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+}
+.comp-label { font-family: var(--FM); font-size: 10px; color: var(--tx2); width: 90px; flex-shrink: 0; }
+.comp-track { flex: 1; height: 8px; background: var(--s3); border-radius: 4px; overflow: hidden; }
+.comp-fill { height: 100%; border-radius: 4px; transition: width 1s cubic-bezier(.34,1.56,.64,1); }
+.comp-val { font-family: var(--FM); font-size: 10px; width: 80px; text-align: right; }
+
+/* Animations */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes pulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%     { opacity: .6; transform: scale(.96); }
+}
+
+/* Panel label */
+.panel-label {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--br);
+  font-family: var(--FM);
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--tx2);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  background: var(--s1);
+}
+
+.slide-content {
+    overflow-y: auto;
+    height: 100%;
+}
+.pl-dot { width: 6px; height: 6px; border-radius: 50%; }
+</style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+
+<!-- ═══════════ SLIDE 1 — INTRO ═══════════ -->
+<div class="slide active" id="s1">
+  <div class="slide-content">
+    <canvas class="s1-particles" id="s1canvas"></canvas>
+    <div class="s1-center">
+      <div class="s1-pre">National Conference on Smart Systems and Generative AI · NCSS.AI'26</div>
+      <div class="s1-logo">ZENO AI</div>
+      <div class="s1-sub">Algorithm</div>
+      <div class="s1-quote">
+        An observed quantum state never moves — so we force the answer to stand still and announce itself.
+        Quantum measurement, turned into a search engine.
+      </div>
+      <div class="s1-team">
+        <div class="team-card">
+          <div class="team-num">01</div>
+          <div class="team-name">Deena</div>
+          <div class="team-dept">Mechatronics · PMC Tech</div>
+        </div>
+        <div class="team-card">
+          <div class="team-num">02</div>
+          <div class="team-name">Rohit</div>
+          <div class="team-dept">Mechatronics · PMC Tech</div>
+        </div>
+        <div class="team-card">
+          <div class="team-num">03</div>
+          <div class="team-name">Shivam</div>
+          <div class="team-dept">Mechatronics · PMC Tech</div>
+        </div>
+        <div class="team-card">
+          <div class="team-num">04</div>
+          <div class="team-name">Venu Gopal</div>
+          <div class="team-dept">Mechatronics · PMC Tech</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 2 — QUANTUM COMPUTER ═══════════ -->
+<div class="slide" id="s2">
+  <div class="slide-content">
+    <div class="slide-header">
+      <div class="slide-tag">Slide 02 · Fundamentals</div>
+      <div class="slide-h1">How a Quantum Computer Works</div>
+      <div class="slide-p">Classical bits are 0 or 1. Qubits exist in superposition — 0 and 1 simultaneously — until measured. This is what enables parallel search.</div>
+    </div>
+    <div class="s2-layout">
+      <div class="s2-left">
+        <div class="info-box q">
+          <strong style="color:var(--q3)">Classical Bit:</strong> A light switch — either OFF (0) or ON (1). Always one state.<br><br>
+          <strong style="color:var(--c3)">Qubit:</strong> A spinning coin — simultaneously heads AND tails until it lands. Collapses to 0 or 1 only when measured.<br><br>
+          <strong style="color:var(--g2)">Superposition:</strong> With 4 qubits we represent 2⁴ = <strong>16 states at once</strong>. A classical register holds only 1 state at a time.
+        </div>
+
+        <div style="text-align:center">
+          <div class="bloch-sphere">
+            <div class="bloch-arrow"></div>
+          </div>
+          <div style="font-family:var(--FM);font-size:9px;letter-spacing:2px;color:var(--tx2);text-transform:uppercase">Bloch Sphere — Qubit State Space</div>
+        </div>
+
+        <div class="info-box c" style="margin-top:4px">
+          <strong style="color:var(--c3)">Why it matters for search:</strong><br>
+          Classical search checks 1 item per step → N steps.<br>
+          Quantum puts all N items in superposition, applies an oracle that <em style="color:var(--q3)">marks the answer</em>, then amplifies it.<br>
+          Result: answer found in <strong style="color:var(--wh)">√N steps</strong>.
+        </div>
+
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <span class="tag-pill q">4 Qubits Used</span>
+          <span class="tag-pill c">16 States Simultaneously</span>
+          <span class="tag-pill g">Qiskit Simulator</span>
+        </div>
+      </div>
+
+      <div class="s2-right">
+        <div class="mac-window">
+          <div class="mac-header">
+            <div class="mac-dot mac-close"></div>
+            <div class="mac-dot mac-min"></div>
+            <div class="mac-dot mac-max"></div>
+            <div class="mac-title">quantum_demo.py — Qiskit Live Demo</div>
+          </div>
+          <div class="mac-body">
+<span class="cm"># Quantum Computer Demo using Qiskit</span>
+<span class="cm"># Shows superposition + measurement collapse</span>
+
+<span class="ck">from</span> qiskit <span class="ck">import</span> <span class="cf">QuantumCircuit</span>, <span class="cf">transpile</span>
+<span class="ck">from</span> qiskit_aer <span class="ck">import</span> <span class="cf">Aer</span>
+<span class="ck">import</span> numpy <span class="ck">as</span> np
+
+<span class="cm"># Create a 2-qubit circuit</span>
+qc = <span class="cf">QuantumCircuit</span>(<span class="cn">2</span>, <span class="cn">2</span>)
+
+<span class="cm"># Step 1: Put qubits into superposition</span>
+<span class="cm"># H gate: |0⟩ → (|0⟩+|1⟩)/√2</span>
+qc.h(<span class="cn">0</span>)  <span class="cm"># qubit 0: both 0 and 1</span>
+qc.h(<span class="cn">1</span>)  <span class="cm"># qubit 1: both 0 and 1</span>
+
+<span class="cm"># Now we have 4 states: |00⟩|01⟩|10⟩|11⟩</span>
+<span class="cm"># All with equal probability 25%</span>
+
+<span class="cm"># Step 2: Entangle with CNOT gate</span>
+qc.cx(<span class="cn">0</span>, <span class="cn">1</span>)  <span class="cm"># correlates the qubits</span>
+
+<span class="cm"># Step 3: Measure — collapses superposition</span>
+qc.measure([<span class="cn">0</span>,<span class="cn">1</span>], [<span class="cn">0</span>,<span class="cn">1</span>])
+
+<span class="cm"># Run on quantum simulator</span>
+backend = <span class="cf">Aer</span>.get_backend(<span class="cs">'qasm_simulator'</span>)
+job = backend.run(<span class="cf">transpile</span>(qc, backend), shots=<span class="cn">1024</span>)
+counts = job.result().get_counts()
+
+<span class="co">print</span>(<span class="cs">f"Results: {counts}"</span>)
+<span class="cm"># Output: {'00': ~512, '11': ~512}</span>
+<span class="cm"># Only 00 and 11 — entanglement!</span>
+          </div>
+          <div class="mac-output">
+            <div class="mo-label">▶ Simulated Output</div>
+            <div class="mo-line">$ python quantum_demo.py</div>
+            <div class="mo-line hi">Results: {'00': 508, '11': 516}</div>
+            <div class="mo-line">→ 2 qubits, 4 possible states explored simultaneously</div>
+            <div class="mo-line">→ Measurement collapses to correlated pairs only</div>
+            <div class="mo-line" style="color:var(--g2)">→ This is quantum entanglement ✓</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 3 — ZENO EFFECT ═══════════ -->
+<div class="slide" id="s3">
+  <div class="slide-content">
+    <div class="s3-layout">
+      <div class="s3-header">
+        <div class="slide-tag">Slide 03 · Core Concept</div>
+        <div class="slide-h1">The Quantum Zeno Effect</div>
+        <div class="slide-p">A quantum system that is constantly observed <strong style="color:var(--q3)">cannot evolve</strong>. Each measurement collapses it back to its initial state. We exploit this to freeze the search answer in place.</div>
+      </div>
+
+      <div class="s3-arena">
+        <div class="zeno-lane">
+          <div class="zl-label free"><div class="dot" style="background:var(--c)"></div>Free Arrow — No Observation</div>
+          <div class="zeno-track" id="freeTrack">
+            <div class="track-line"></div>
+            <div class="arrow-projectile free-arrow" id="freeArrow" style="left:30px">
+              <div class="arrow-body"></div>
+              <div class="arrow-head"></div>
+            </div>
+          </div>
+          <div class="zl-info">
+            <strong>No measurement during flight.</strong><br>
+            Arrow evolves freely → travels full distance.<br>
+            <span class="highlight">Classical behavior: unobserved = moves freely.</span>
+          </div>
+        </div>
+
+        <div class="zeno-lane">
+          <div class="zl-label observed"><div class="dot" style="background:var(--q)"></div>Observed Arrow — Frequent Measurement</div>
+          <div class="zeno-track" id="obsTrack">
+            <div class="track-line"></div>
+            <!-- Observation markers -->
+            <div class="obs-marker" style="left:15%" data-n="M1"></div>
+            <div class="obs-marker" style="left:30%" data-n="M2"></div>
+            <div class="obs-marker" style="left:45%" data-n="M3"></div>
+            <div class="obs-marker" style="left:60%" data-n="M4"></div>
+            <div class="obs-marker" style="left:75%" data-n="M5"></div>
+            <div class="arrow-projectile obs-arrow" id="obsArrow" style="left:30px">
+              <div class="arrow-body"></div>
+              <div class="arrow-head"></div>
+            </div>
+            <div class="obs-dot" id="obsDot" style="left:30px;display:none"></div>
+          </div>
+          <div class="zl-info">
+            <strong>Measured at every checkpoint.</strong><br>
+            Each measurement <span class="highlight">collapses state back to initial</span>.<br>
+            Arrow <strong>freezes in place</strong> — Zeno Effect!
+          </div>
+        </div>
+      </div>
+
+      <div class="zeno-ctrl">
+        <button class="run-btn c" id="zenoBtn" onclick="runZeno()">▶ Launch Arrows</button>
+        <button class="run-btn q" onclick="resetZeno()" style="background:transparent;border-color:var(--br2);color:var(--tx2)">Reset</button>
+        <div class="info-box q" style="flex:1;padding:10px 16px">
+          <strong style="color:var(--q3)">Zeno in Quantum Search:</strong>
+          We measure frequently near the target state — the answer gets "frozen" at maximum probability. Then we read it out.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 4 — CLASSICAL SEARCH ═══════════ -->
+<div class="slide" id="s4">
+  <div class="slide-content">
+    <div class="slide-header">
+      <div class="slide-tag">Slide 04 · Classical Method</div>
+      <div class="slide-h1">Classical Search — O(N) Linear Scan</div>
+      <div class="slide-p">The computer checks every number one by one until it finds the target. N=100 numbers, worst case: 100 checks. Watch it happen in real time with actual timing.</div>
+    </div>
+    <div class="s4-layout">
+      <div class="s4-main">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div class="target-input-wrap">
+            <span class="ti-label">Target Number</span>
+            <input class="ti-input" type="number" id="classTarget" value="73" min="1" max="100">
+            <span style="font-family:var(--FM);font-size:10px;color:var(--tx2)">(1–100)</span>
+          </div>
+          <button class="run-btn c" id="classBtn" onclick="runClassical()">▶ Run Classical Search</button>
+          <button class="run-btn" style="background:transparent;border-color:var(--br2);color:var(--tx2);border:1px solid" onclick="resetClassical()">Reset</button>
+          <div class="tag-pill c" id="classSpeed">Speed: —</div>
+        </div>
+
+        <div class="class-metrics">
+          <div class="cm-box">
+            <div class="cm-val" id="cmSteps" style="color:var(--c)">0</div>
+            <div class="cm-lbl">Steps Taken</div>
+          </div>
+          <div class="cm-box">
+            <div class="cm-val" id="cmTime" style="color:var(--y)">0 ms</div>
+            <div class="cm-lbl">Time Elapsed</div>
+          </div>
+          <div class="cm-box">
+            <div class="cm-val" id="cmFound" style="color:var(--tx3)">—</div>
+            <div class="cm-lbl">Found at Index</div>
+          </div>
+        </div>
+
+        <!-- Comparison bars (shown after both run) -->
+        <div id="compSection" style="display:none">
+          <div style="font-family:var(--FM);font-size:9px;letter-spacing:3px;color:var(--tx2);text-transform:uppercase;margin-bottom:10px">Efficiency Comparison</div>
+          <div class="comparison-row">
+            <span class="comp-label">Classical</span>
+            <div class="comp-track"><div class="comp-fill" id="compClassFill" style="width:0;background:var(--c)"></div></div>
+            <span class="comp-val" id="compClassVal" style="color:var(--c)"></span>
+          </div>
+          <div class="comparison-row">
+            <span class="comp-label">Quantum</span>
+            <div class="comp-track"><div class="comp-fill" id="compQuantFill" style="width:0;background:var(--q)"></div></div>
+            <span class="comp-val" id="compQuantVal" style="color:var(--q)"></span>
+          </div>
+        </div>
+
+        <div class="num-grid" id="classGrid"></div>
+      </div>
+
+      <div class="s4-right">
+        <div class="panel-label">
+          <div class="pl-dot" style="background:var(--c)"></div>
+          Search Log
+        </div>
+        <div class="log-panel" id="classLog">
+          <div class="log-line info">Set target number and press Run Classical Search.</div>
+          <div class="log-line info">The loop checks each number from 1 to 100.</div>
+        </div>
+        <div style="padding:12px 16px;border-top:1px solid var(--br);flex-shrink:0">
+          <div class="info-box c">
+            <strong style="color:var(--c3)">Real Code Running:</strong><br>
+            <code style="color:var(--tx)">for i in range(1, 101):<br>&nbsp;&nbsp;if i == target: return i</code><br>
+            Worst case: 100 iterations. Average: 50.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 5 — QUANTUM SEARCH ═══════════ -->
+<div class="slide" id="s5">
+  <div class="slide-content">
+    <div class="slide-header">
+      <div class="slide-tag">Slide 05 · Quantum Method</div>
+      <div class="slide-h1">Quantum Search — O(√N) Grover's Algorithm</div>
+      <div class="slide-p">All 100 numbers enter superposition simultaneously. The oracle marks the target. The diffuser amplifies it. After √100 = <strong style="color:var(--q3)">10 iterations</strong> — the answer dominates.</div>
+    </div>
+    <div class="s5-layout">
+      <div class="s5-main">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div class="target-input-wrap">
+            <span class="ti-label">Target Number</span>
+            <input class="ti-input" type="number" id="quantTarget" value="73" min="1" max="100">
+          </div>
+          <button class="run-btn q" id="quantBtn" onclick="runQuantum()">▶ Run Quantum Search</button>
+          <button class="run-btn" style="background:transparent;border-color:var(--br2);color:var(--tx2);border:1px solid" onclick="resetQuantum()">Reset</button>
+          <div class="tag-pill q" id="quantSpeed">Iterations: —</div>
+        </div>
+
+        <div class="qstate-info">
+          <div class="qsi">
+            <div class="qsi-val" id="qIter" style="color:var(--q3)">0</div>
+            <div class="qsi-lbl">Grover Iterations</div>
+          </div>
+          <div class="qsi c">
+            <div class="qsi-val" id="qProb" style="color:var(--c3)">6.25%</div>
+            <div class="qsi-lbl">Target Probability</div>
+          </div>
+          <div class="qsi g">
+            <div class="qsi-val" id="qFound" style="color:var(--tx3)">—</div>
+            <div class="qsi-lbl">Result</div>
+          </div>
+          <div class="qsi y">
+            <div class="qsi-val" id="qSpeedup" style="color:var(--tx3)">—</div>
+            <div class="qsi-lbl">vs Classical</div>
+          </div>
+        </div>
+
+        <!-- Amplitude visualization - 20 bars for display -->
+        <div style="font-family:var(--FM);font-size:9px;letter-spacing:3px;color:var(--tx2);text-transform:uppercase;margin-bottom:6px">Quantum Amplitude Distribution (sample of 20 states)</div>
+        <div class="amp-grid" id="ampGrid"></div>
+
+        <div class="info-box q">
+          <strong style="color:var(--q3)">Grover's Oracle marks state |target⟩ with phase flip (-1).</strong>
+          Diffuser reflects amplitudes about average → target amplitude grows each iteration.
+          After π/4·√N ≈ 10 iterations, P(target) → 97%+.
+        </div>
+      </div>
+
+      <div class="s5-right">
+        <div class="panel-label">
+          <div class="pl-dot" style="background:var(--q)"></div>
+          Quantum Circuit Log
+        </div>
+        <div class="log-panel" id="quantLog">
+          <div class="log-line info">Set target and press Run Quantum Search.</div>
+          <div class="log-line info">Simulates Grover's algorithm via Qiskit backend.</div>
+        </div>
+        <div style="padding:12px 16px;border-top:1px solid var(--br);flex-shrink:0">
+          <div class="mac-window" style="border-radius:8px">
+            <div class="mac-header">
+              <div class="mac-dot mac-close"></div>
+              <div class="mac-dot mac-min"></div>
+              <div class="mac-dot mac-max"></div>
+              <div class="mac-title">grover_search.py</div>
+            </div>
+            <div class="mac-body" style="font-size:10px;padding:10px 14px">
+<span class="cm"># Core Grover circuit</span>
+qc = <span class="cf">QuantumCircuit</span>(<span class="cn">7</span>, <span class="cn">7</span>)
+qc.h(range(<span class="cn">7</span>))  <span class="cm"># superposition</span>
+
+<span class="ck">for</span> _ <span class="ck">in</span> range(iterations):
+    build_oracle(qc, target)
+    build_diffuser(qc)
+
+qc.measure(range(<span class="cn">7</span>), range(<span class="cn">7</span>))
+<span class="cm"># 7 qubits = 2^7 = 128 states</span>
+<span class="cm"># covers 1-100</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 6 — AI APPLICATIONS ═══════════ -->
+<div class="slide" id="s6">
+  <div class="slide-content">
+    <div class="s6-layout">
+      <div class="slide-header">
+        <div class="slide-tag">Slide 06 · Impact</div>
+        <div class="slide-h1">AI Fields Transformed by Quantum Search</div>
+        <div class="slide-p">Every AI system that searches, matches, or retrieves has a bottleneck at O(N). Quantum search breaks that wall.</div>
+      </div>
+      <div class="app-grid">
+        <div class="app-col">
+          <div class="app-card q-card">
+            <div class="ac-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.8" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+            <div class="ac-title">Face Recognition</div>
+            <div class="ac-desc">Match a face against millions of records in real time. Classical AI checks every face sequentially.</div>
+            <div class="ac-speedup"><span class="label">10M database</span><span class="val">3,162× faster</span></div>
+            <div class="ac-limit">Current limit: O(N) exhaustive search is bottleneck at scale</div>
+          </div>
+          <div class="app-card q-card">
+            <div class="ac-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+            <div class="ac-title">k-NN Classification</div>
+            <div class="ac-desc">Find K nearest neighbors for classification. Used in medical diagnosis, spam detection, image labeling.</div>
+            <div class="ac-speedup"><span class="label">1M training set</span><span class="val">1,000× faster</span></div>
+            <div class="ac-limit">Current limit: Real-time inference impossible for large datasets</div>
+          </div>
+        </div>
+        <div class="app-col">
+          <div class="app-card c-card">
+            <div class="ac-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#67e8f9" stroke-width="1.8" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+            <div class="ac-title">Fraud Detection</div>
+            <div class="ac-desc">Find transactions similar to known fraud patterns. Banks process 500M transactions daily — speed is life or death.</div>
+            <div class="ac-speedup"><span class="label">500M transactions</span><span class="val">22,360× faster</span></div>
+            <div class="ac-limit">Current limit: Post-facto detection only — quantum enables real-time</div>
+          </div>
+          <div class="app-card c-card">
+            <div class="ac-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#67e8f9" stroke-width="1.8" stroke-linecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+            <div class="ac-title">Recommendation AI</div>
+            <div class="ac-desc">Netflix, Spotify, Amazon — finding your nearest-neighbor users to recommend content. Scales to billions of users.</div>
+            <div class="ac-speedup"><span class="label">1B users</span><span class="val">31,623× faster</span></div>
+            <div class="ac-limit">Current limit: Approximate methods used — quality sacrificed for speed</div>
+          </div>
+        </div>
+        <div class="app-col">
+          <div class="app-card g-card">
+            <div class="ac-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="1.8" stroke-linecap="round"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9"/></svg></div>
+            <div class="ac-title">Drug Discovery</div>
+            <div class="ac-desc">Search 1 billion molecular structures for drug candidates. Current AI takes weeks of supercomputer time.</div>
+            <div class="ac-speedup"><span class="label">1B molecules</span><span class="val">15,811× faster</span></div>
+            <div class="ac-limit">Current limit: Only large pharma can afford compute — quantum democratizes it</div>
+          </div>
+          <div class="app-card g-card">
+            <div class="ac-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+            <div class="ac-title">LLM Retrieval (RAG)</div>
+            <div class="ac-desc">Large language models search vector databases to retrieve context. Quantum search accelerates every single LLM query.</div>
+            <div class="ac-speedup"><span class="label">100M vectors</span><span class="val">10,000× faster</span></div>
+            <div class="ac-limit">Current limit: Vector search is #1 bottleneck in production RAG systems</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 7 — REALISTIC APPROACH ═══════════ -->
+<div class="slide" id="s7">
+  <div class="slide-content">
+    <div class="slide-header">
+      <div class="slide-tag">Slide 07 · Honest Assessment</div>
+      <div class="slide-h1">The Realistic Approach — Why We Can't Deploy Today</div>
+      <div class="slide-p">We are honest: full quantum computers don't exist yet. Here's exactly where we stand, what works now, and when this becomes real.</div>
+    </div>
+    <div class="s7-layout">
+      <div class="s7-body">
+        <div class="reality-card" style="border-left:2px solid var(--r)">
+          <div class="rc-head">
+            <div class="rc-icon" style="background:#f43f5e15;border:1px solid #f43f5e25">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div>
+              <div class="rc-title">Current Limitations</div>
+              <div class="rc-sub">Why quantum AI isn't deployed yet</div>
+            </div>
+          </div>
+          <ul class="rc-list">
+            <li>Quantum decoherence — qubits lose their state in microseconds. Real computations must finish before this.</li>
+            <li>Gate error rates ~0.1–1% per operation. For 100-qubit algorithms, errors compound catastrophically.</li>
+            <li>Current best machines: 433 qubits (IBM Eagle). Grover's for 1M items needs ~20 stable qubits — almost in range.</li>
+            <li>No quantum RAM exists. Loading classical data into quantum states (QRAM) is an unsolved bottleneck.</li>
+            <li>Error correction requires 1000+ physical qubits per logical qubit — making effective scale still years away.</li>
+          </ul>
+        </div>
+
+        <div class="reality-card" style="border-left:2px solid var(--g)">
+          <div class="rc-head">
+            <div class="rc-icon" style="background:#10b98115;border:1px solid #10b98125">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="1.8" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <div class="rc-title">What Works Right Now</div>
+              <div class="rc-sub">Our actual implementation today</div>
+            </div>
+          </div>
+          <ul class="rc-list">
+            <li><strong style="color:var(--wh)">Qiskit Aer Simulator</strong> — We run real Grover circuits on a classical quantum simulator. The algorithm is 100% correct.</li>
+            <li><strong style="color:var(--wh)">IBM Quantum Cloud</strong> — The same code runs on IBM's 127-qubit real quantum hardware today, free via IBM Quantum Experience.</li>
+            <li><strong style="color:var(--wh)">Proof of speedup</strong> — Our simulation proves the √N advantage mathematically and visually.</li>
+            <li><strong style="color:var(--wh)">Algorithm is production-ready</strong> — When hardware matures, our code deploys unchanged.</li>
+          </ul>
+        </div>
+
+        <div class="reality-card" style="grid-column:1/-1;border-left:2px solid var(--q)">
+          <div class="rc-title" style="margin-bottom:12px;font-family:var(--FD);font-size:14px;letter-spacing:1px;color:var(--wh)">Roadmap to Real Quantum AI</div>
+          <div class="rm-item">
+            <div class="rm-num">01</div>
+            <div class="rm-content">
+              <div class="rm-title">TODAY — Simulation + IBM Quantum Cloud</div>
+              <div class="rm-desc">Our algorithm runs on Qiskit simulator and IBM's real 127-qubit machines. Results match theory. Algorithm validated.</div>
+            </div>
+            <div class="rm-status now">Working Now</div>
+          </div>
+          <div class="rm-item">
+            <div class="rm-num">02</div>
+            <div class="rm-content">
+              <div class="rm-title">2026–2027 — Fault-Tolerant Small Scale</div>
+              <div class="rm-desc">IBM, Google, IonQ targeting 1000+ logical qubits with error correction. Small databases (1M items) become feasible for production quantum search.</div>
+            </div>
+            <div class="rm-status near">Near Future</div>
+          </div>
+          <div class="rm-item">
+            <div class="rm-num">03</div>
+            <div class="rm-content">
+              <div class="rm-title">2030+ — Full Quantum AI Integration</div>
+              <div class="rm-desc">QRAM solved, error rates below 0.001%, millions of logical qubits. Every AI search system migrates to quantum backends. Our algorithm becomes standard.</div>
+            </div>
+            <div class="rm-status future">Future Vision</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SLIDE 8 — THANK YOU ═══════════ -->
+<div class="slide" id="s8">
+  <div class="slide-content">
+    <div class="s8-center">
+      <div style="font-family:var(--FM);font-size:9px;letter-spacing:5px;color:var(--tx3);text-transform:uppercase;animation:fadeUp .6s .1s both">NCSS.AI'26 · PMC Tech College · Mechatronics Engineering</div>
+      <div class="s8-big">Thank You</div>
+      <div class="s8-sub">Zeno AI Algorithm — Quantum-Accelerated Search</div>
+      <div class="s8-questions">Open for Questions</div>
+      <div class="s8-team-row">
+        <div class="s8-member">Deena</div>
+        <div class="s8-member">Rohit</div>
+        <div class="s8-member">Shivam</div>
+        <div class="s8-member">Venu Gopal</div>
+      </div>
+      <div style="font-family:var(--FM);font-size:11px;color:var(--tx2);line-height:2;text-align:center;animation:fadeUp .8s .9s both;max-width:560px">
+        "Classical AI searches like reading every page.<br>Quantum AI searches like using the index."<br>
+        <span style="color:var(--tx3)">— Our one-line summary</span>
+      </div>
+      <div class="s8-inst">PMC Tech College · Mechatronics Engineering · NCSS.AI'26</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ NAV BAR ═══════════ -->
+<div class="nav-bar">
+  <div class="nav-slides" id="navPips"></div>
+  <div class="nav-title" id="navSlideTitle">Intro</div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="slide-counter" id="slideCounter">1 / 8</div>
+    <div class="nav-btns">
+      <button class="nav-btn" onclick="prevSlide()">← Prev</button>
+      <button class="nav-btn primary" onclick="nextSlide()">Next →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ══════════════════════════════════════════
+   SLIDE NAVIGATION
+══════════════════════════════════════════ */
+const SLIDES = ['s1','s2','s3','s4','s5','s6','s7','s8'];
+const TITLES = ['Intro','Quantum Computer','Zeno Effect','Classical Search','Quantum Search','AI Applications','Realistic Approach','Thank You'];
+let current = 0;
+
+function buildPips(){
+  const c = document.getElementById('navPips');
+  c.innerHTML = '';
+  SLIDES.forEach((_, i) => {
+    const pip = document.createElement('div');
+    pip.className = 'nav-pip' + (i===0?' active':'');
+    pip.onclick = () => goTo(i);
+    pip.title = TITLES[i];
+    c.appendChild(pip);
+  });
+}
+
+function goTo(idx){
+  if(idx < 0 || idx >= SLIDES.length || idx === current) return;
+  const prev = current;
+  current = idx;
+  document.getElementById(SLIDES[prev]).classList.remove('active');
+  document.getElementById(SLIDES[prev]).classList.add('exit-left');
+  setTimeout(()=>{document.getElementById(SLIDES[prev]).classList.remove('exit-left');},700);
+  document.getElementById(SLIDES[current]).classList.add('active');
+  document.querySelectorAll('.nav-pip').forEach((p,i)=>p.classList.toggle('active',i===current));
+  document.getElementById('navSlideTitle').textContent = TITLES[current];
+  document.getElementById('slideCounter').textContent = `${current+1} / ${SLIDES.length}`;
+  onSlideEnter(current);
+}
+
+function nextSlide(){ goTo(current+1); }
+function prevSlide(){ goTo(current-1); }
+
+document.addEventListener('keydown', e=>{
+  if(e.key==='ArrowRight'||e.key==='ArrowDown'||e.key===' ') nextSlide();
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp') prevSlide();
+});
+
+function onSlideEnter(idx){
+  if(idx===0) initS1Particles();
+  if(idx===1) setTimeout(()=>{document.getElementById('classBar').style.width='90%';document.getElementById('quantBar').style.width='12%';},300);
+  if(idx===2) resetZeno();
+  if(idx===3) buildClassGrid();
+  if(idx===4) buildAmpGrid();
+}
+
+/* ══════════════════════════════════════════
+   BACKGROUND CANVAS
+══════════════════════════════════════════ */
+(function(){
+  const cv = document.getElementById('bgCanvas'), ctx = cv.getContext('2d');
+  let W,H,pts=[];
+  const resize=()=>{W=cv.width=innerWidth;H=cv.height=innerHeight;};
+  const init=()=>{resize();pts=Array.from({length:20},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.2,vy:(Math.random()-.5)*.2,r:1+Math.random()}));};
+  const draw=()=>{
+    ctx.clearRect(0,0,W,H);
+    for(let i=0;i<pts.length;i++) for(let j=i+1;j<pts.length;j++){
+      const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);
+      if(d<200){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.strokeStyle=`rgba(139,92,246,${(1-d/200)*.08})`;ctx.lineWidth=.8;ctx.stroke();}
+    }
+    pts.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba(139,92,246,0.35)';ctx.fill();p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;});
+    requestAnimationFrame(draw);
+  };
+  window.addEventListener('resize',resize);
+  init();draw();
+})();
+
+/* ══════════════════════════════════════════
+   SLIDE 1 — PARTICLES
+══════════════════════════════════════════ */
+function initS1Particles(){
+  const cv = document.getElementById('s1canvas');
+  if(!cv) return;
+  cv.width = innerWidth; cv.height = innerHeight;
+  const ctx = cv.getContext('2d');
+  const particles = Array.from({length:60},()=>({
+    x:Math.random()*cv.width, y:Math.random()*cv.height,
+    vx:(Math.random()-.5)*.5, vy:(Math.random()-.5)*.5,
+    life:Math.random(), maxLife:0.5+Math.random()*2,
+    size:1+Math.random()*3,
+    col:Math.random()<.5?'139,92,246':'6,182,212'
+  }));
+  let af;
+  function draw(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    particles.forEach(p=>{
+      p.life+=.008; if(p.life>p.maxLife){p.life=0;p.x=Math.random()*cv.width;p.y=Math.random()*cv.height;}
+      const alpha=Math.sin(p.life/p.maxLife*Math.PI)*0.6;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+      ctx.fillStyle=`rgba(${p.col},${alpha})`;ctx.fill();
+      p.x+=p.vx;p.y+=p.vy;
+    });
+    af=requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+/* ══════════════════════════════════════════
+   SLIDE 3 — ZENO ANIMATION
+══════════════════════════════════════════ */
+let zenoAF = null, zenoRunning = false;
+
+function runZeno(){
+  if(zenoRunning) return;
+  zenoRunning = true;
+  const freeArrow = document.getElementById('freeArrow');
+  const obsArrow  = document.getElementById('obsArrow');
+  const obsDot    = document.getElementById('obsDot');
+  const track     = document.getElementById('freeTrack');
+  const trackW    = track.offsetWidth - 80;
+
+  let freeX = 30, obsX = 30;
+  let step = 0, obsStep = 0;
+  const totalSteps = 120;
+  const markers = [15,30,45,60,75]; // % positions
+
+  document.getElementById('zenoBtn').disabled = true;
+  obsDot.style.display = 'block';
+
+  function tick(){
+    step++;
+
+    // Free arrow moves smoothly
+    freeX = 30 + (step / totalSteps) * trackW;
+    freeArrow.style.left = freeX + 'px';
+
+    // Observed arrow: moves a tiny bit, then collapses back at markers
+    const pct = (obsX - 30) / trackW * 100;
+    const nearMarker = markers.some(m => Math.abs(pct - m) < 2);
+
+    if(nearMarker){
+      // Zeno collapse — flash and stay
+      obsDot.style.left = obsX + 'px';
+      obsDot.style.background = '#fbbf24';
+      obsArrow.style.left = '30px';
+      obsX = 30; // reset!
+      setTimeout(()=>obsDot.style.background='#f43f5e', 300);
+    } else {
+      obsX += 2;
+      obsArrow.style.left = obsX + 'px';
+      obsDot.style.left = obsX + 'px';
+    }
+
+    if(step < totalSteps) zenoAF = requestAnimationFrame(tick);
+    else {
+      zenoRunning = false;
+      document.getElementById('zenoBtn').disabled = false;
+    }
+  }
+  zenoAF = requestAnimationFrame(tick);
+}
+
+function resetZeno(){
+  if(zenoAF) cancelAnimationFrame(zenoAF);
+  zenoRunning = false;
+  document.getElementById('freeArrow').style.left = '30px';
+  document.getElementById('obsArrow').style.left = '30px';
+  document.getElementById('obsDot').style.left = '30px';
+  document.getElementById('obsDot').style.display = 'none';
+  document.getElementById('zenoBtn').disabled = false;
+}
+
+/* ══════════════════════════════════════════
+   SLIDE 4 — CLASSICAL SEARCH
+══════════════════════════════════════════ */
+let classRunning = false;
+let classAF = null;
+let classStepsGlobal = 0;
+let classTimeGlobal = 0;
+
+function buildClassGrid(){
+  const grid = document.getElementById('classGrid');
+  if(!grid) return;
+  grid.innerHTML = '';
+  for(let i=1;i<=100;i++){
+    const cell = document.createElement('div');
+    cell.className = 'num-cell';
+    cell.id = `cc${i}`;
+    cell.textContent = i;
+    grid.appendChild(cell);
+  }
+}
+
+function addClassLog(msg, type='info'){
+  const log = document.getElementById('classLog');
+  const div = document.createElement('div');
+  div.className = `log-line ${type}`;
+  div.textContent = msg;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+
+async function runClassical(){
+  const targetVal = parseInt(document.getElementById('classTarget').value);
+  if(isNaN(targetVal)||targetVal<1||targetVal>100){ addClassLog('Enter a number between 1 and 100.','error'); return; }
+  if(classRunning) return;
+  classRunning = true;
+
+  document.getElementById('classBtn').disabled = true;
+  document.getElementById('classLog').innerHTML = '';
+  buildClassGrid();
+
+  addClassLog(`Classical for-loop search. Target: ${targetVal}`, 'info');
+  addClassLog('for i in range(1, 101): if i == target: return i', 'info');
+
+  const startTime = performance.now();
+  let steps = 0;
+
+  // Highlight target in grid
+  document.getElementById(`cc${targetVal}`).classList.add('target');
+
+  for(let i=1;i<=100;i++){
+    steps++;
+    const cell = document.getElementById(`cc${i}`);
+    cell.classList.add('scanning');
+
+    const elapsed = performance.now() - startTime;
+    document.getElementById('cmSteps').textContent = steps;
+    document.getElementById('cmTime').textContent = elapsed.toFixed(2) + ' ms';
+
+    if(i === targetVal){
+      cell.classList.remove('scanning');
+      cell.classList.add('found');
+      const totalTime = performance.now() - startTime;
+      classStepsGlobal = steps;
+      classTimeGlobal = totalTime;
+      addClassLog(`✓ FOUND at index ${i} after ${steps} steps`, 'success');
+      addClassLog(`Total time: ${totalTime.toFixed(3)} ms`, 'success');
+      document.getElementById('cmFound').textContent = i;
+      document.getElementById('cmFound').style.color = 'var(--g)';
+      document.getElementById('classSpeed').textContent = `Steps: ${steps} / 100`;
+      updateComparison();
+      break;
+    } else {
+      await sleep(28);
+      cell.classList.remove('scanning');
+      cell.classList.add('checked');
+    }
+  }
+
+  classRunning = false;
+  document.getElementById('classBtn').disabled = false;
+}
+
+function resetClassical(){
+  classRunning = false;
+  buildClassGrid();
+  document.getElementById('cmSteps').textContent = '0';
+  document.getElementById('cmTime').textContent = '0 ms';
+  document.getElementById('cmFound').textContent = '—';
+  document.getElementById('cmFound').style.color = 'var(--tx3)';
+  document.getElementById('classSpeed').textContent = 'Speed: —';
+  document.getElementById('classLog').innerHTML = '<div class="log-line info">Set target number and press Run Classical Search.</div>';
+  document.getElementById('compSection').style.display = 'none';
+}
+
+/* ══════════════════════════════════════════
+   SLIDE 5 — QUANTUM SEARCH
+══════════════════════════════════════════ */
+const N_QUANTUM = 128; // 2^7
+let quantRunning = false;
+let quantStepsGlobal = 0;
+
+function buildAmpGrid(){
+  const grid = document.getElementById('ampGrid');
+  if(!grid) return;
+  grid.innerHTML = '';
+  const uniform = 1/20;
+  for(let i=0;i<20;i++){
+    const bar = document.createElement('div');
+    bar.className = 'amp-bar';
+    bar.id = `ab${i}`;
+    bar.style.height = (uniform * 100 * 1.5) + 'px';
+    grid.appendChild(bar);
+  }
+}
+
+function addQuantLog(msg, type='info'){
+  const log = document.getElementById('quantLog');
+  const div = document.createElement('div');
+  div.className = `log-line ${type}`;
+  div.textContent = msg;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+async function runQuantum() {
+    const target = parseInt(document.getElementById('quantTarget').value);
+    if (isNaN(target) || target < 1 || target > 100) return;
+    
+    document.getElementById('quantBtn').disabled = true;
+    addQuantLog('Calling real Qiskit backend...', 'info');
+    
+    try {
+        const res = await fetch('http://localhost:5000/grover', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ target: target })
+        });
+        const data = await res.json();
+        addQuantLog(`✓ Quantum found ${data.found} in ${data.iterations} iterations`, 'success');
+        document.getElementById('qFound').textContent = data.found;
+        document.getElementById('qIter').textContent = data.iterations;
+        document.getElementById('qSpeedup').textContent = `${(100/data.iterations).toFixed(1)}×`;
+        // Update probability bars using data.counts if you want
+    } catch(e) {
+        addQuantLog('Backend not running. Run python quantum_backend.py', 'error');
+    }
+    document.getElementById('quantBtn').disabled = false;
+}
+  // Result
+  addQuantLog(`✓ Measurement: |${targetVal}⟩ collapsed with P=${(document.getElementById('qProb').textContent)}`, 'success');
+  addQuantLog(`✓ FOUND: ${targetVal} in ${iterations} iterations (classical needed up to 100)`, 'success');
+
+  document.getElementById('qFound').textContent = targetVal;
+  document.getElementById('qFound').style.color = 'var(--g2)';
+  document.getElementById('qSpeedup').textContent = `${(100/iterations).toFixed(1)}×`;
+  document.getElementById('qSpeedup').style.color = 'var(--g2)';
+  document.getElementById('quantSpeed').textContent = `${iterations} iterations`;
+
+  updateComparison();
+  quantRunning = false;
+  document.getElementById('quantBtn').disabled = false;
+}
+
+function resetQuantum(){
+  quantRunning = false;
+  buildAmpGrid();
+  document.getElementById('qIter').textContent = '0';
+  document.getElementById('qProb').textContent = '6.25%';
+  document.getElementById('qFound').textContent = '—';
+  document.getElementById('qFound').style.color = 'var(--tx3)';
+  document.getElementById('qSpeedup').textContent = '—';
+  document.getElementById('qSpeedup').style.color = 'var(--tx3)';
+  document.getElementById('quantSpeed').textContent = 'Iterations: —';
+  document.getElementById('quantLog').innerHTML = '<div class="log-line info">Set target and press Run Quantum Search.</div>';
+  document.getElementById('compSection').style.display = 'none';
+}
+
+/* ══════════════════════════════════════════
+   COMPARISON SECTION
+══════════════════════════════════════════ */
+function updateComparison(){
+  if(!classStepsGlobal || !quantStepsGlobal) return;
+  document.getElementById('compSection').style.display = 'block';
+  const maxSteps = Math.max(classStepsGlobal, quantStepsGlobal);
+  setTimeout(()=>{
+    document.getElementById('compClassFill').style.width = (classStepsGlobal/100*100)+'%';
+    document.getElementById('compQuantFill').style.width = (quantStepsGlobal/100*100)+'%';
+    document.getElementById('compClassVal').textContent = classStepsGlobal+' steps';
+    document.getElementById('compQuantVal').textContent = quantStepsGlobal+' iterations';
+  },100);
+}
+
+/* ══════════════════════════════════════════
+   SLIDE 2 — HERO BARS
+══════════════════════════════════════════ */
+// These are defined inline on slide 2 as elements, animated on enter
+
+/* ══════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════ */
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+buildPips();
+buildClassGrid();
+buildAmpGrid();
+initS1Particles();
+onSlideEnter(0);
+
+// Sync target inputs
+document.getElementById('classTarget').addEventListener('change', function(){
+  document.getElementById('quantTarget').value = this.value;
+});
+document.getElementById('quantTarget').addEventListener('change', function(){
+  document.getElementById('classTarget').value = this.value;
+});
+</script>
+</body>
+</html>
+
